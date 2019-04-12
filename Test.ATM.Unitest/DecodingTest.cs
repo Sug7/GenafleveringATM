@@ -15,11 +15,11 @@ namespace Test.ATM.Unitest
     {
         private ITransponderReceiver _receiver;
         private List<Update> _ftracks;
-        // public event EventHandler<UpdateEvent> _updateCreated;
-        private TransponderReceiver.RawTransponderDataEventArgs _fakeData;
+        //public event EventHandler<Decoding.UpdateEvent> _updateCreated;
+        private RawTransponderDataEventArgs _fakeData;
         private Decoding _uut;
         private List<string> list;
-        private int _eventCalled;
+        int _eventCalled;
 
         [SetUp]
 
@@ -31,11 +31,10 @@ namespace Test.ATM.Unitest
             _ftracks = new List<Update>();
             _uut = new Decoding(_receiver);
             list.Add("Test1;111;222;333;20190325135320120");
-            _fakeData = new TransponderReceiver.RawTransponderDataEventArgs(list);
+            _fakeData = new RawTransponderDataEventArgs(list);
 
-            _uut._updateCreated += (o, args) =>
+            _uut._updateCreated += (o, args) => _ftracks = args.updatetracks;
             {
-                _ftracks = args.updatetracks;
                 ++_eventCalled;
             };
         }
@@ -66,7 +65,8 @@ namespace Test.ATM.Unitest
         [Test]
         public void MoreStrings_Raises_OneEvent()
         {
-            _fakeData.TransponderData.Add("Test2;222;333;444;20200325135320120");
+            
+            _fakeData.TransponderData.Add("Test2;222;333;444;20200325135320120"); //to obejkter 1 event 
             _fakeData.TransponderData.Add("Test3;222;333;444;20210325135320120");
             _receiver.TransponderDataReady += Raise.EventWith(_fakeData);
 

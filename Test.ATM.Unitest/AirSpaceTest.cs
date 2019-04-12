@@ -70,46 +70,72 @@ namespace Test.ATM.Unitest
             _track6._ycoordinate = 26000;
             _track6._altitude = 1000;
 
-            _track7 = Substitute.For<ITrack>();
-            _track7._tag = "Flight7";
-            _track7._xcoordinate = 80000;
-            _track7._ycoordinate = 40000;
-            _track7._altitude = 500;
+            //_track7 = Substitute.For<ITrack>();
+            //_track7._tag = "Flight7";
+            //_track7._xcoordinate = 80000;
+            //_track7._ycoordinate = 40000;
+            //_track7._altitude = 500;
 
             _trackFilter = Substitute.For<IFilter>();
             _writer = Substitute.For<IWriter>();
 
             _uut = new AirSpace(_trackFilter, _writer);
 
-            _uut.SplitCreated += (o, args) =>
+            _uut.SplitCreated += (o, args) => _conditionList = args.Conditiontracks;
             {
-                _conditionList = args.Conditiontracks;
+               
                 ++_eventCalled;
             }
             ;
         }
-
-        [Test]
-        public void TwoTracks_Returns_Positive()
+        ////Test 1
+        //[Test]
+        //public void TwoTracks_Close_ToEachother()
+        //{
+        //    _fakeTrackEvent.tracks[_track4._tag] = _track4;
+        //    _fakeTrackEvent.tracks[_track5._tag] = _track5;
+        //    _trackFilter.TrackEdited += Raise.EventWith(_fakeTrackEvent);
+        //    //double distance = _uut.Distance(_track1, _track2);
+        //    //Assert.That(distance, Is.EqualTo(50000));
+        //    Assert.That(_conditionList.Count, Is.EqualTo(1));
+        //}
+        ////Test 2
+        //[Test]
+        //public void TwoTracks_Far_Away()
+        //{
+        //    _fakeTrackEvent.tracks[_track1._tag] = _track1;
+        //    _fakeTrackEvent.tracks[_track2._tag] = _track2;
+        //    _trackFilter.TrackEdited += Raise.EventWith(_fakeTrackEvent);
+        //    //double distance = _uut.Distance(_track1, _track2);
+        //    //Assert.That(distance, Is.EqualTo(50000));
+        //    Assert.That(_conditionList.First().detectingFligts.Count, Is.EqualTo(0));
+        //}
+        public void onTrackEdited_Conflicts_ConflictsAddedToList()
         {
-            _fakeTrackEvent.tracks[_track4._tag] = _track4;
-            _fakeTrackEvent.tracks[_track5._tag] = _track5;
+            Dictionary<String, ITrack> myTracks = new Dictionary<string, ITrack>();
+            myTracks.Add(_track3._tag, _track3);
+            myTracks.Add(_track5._tag, _track5);
+            myTracks.Add(_track6._tag, _track6);
+
+            _fakeTrackEvent.tracks = myTracks;
             _trackFilter.TrackEdited += Raise.EventWith(_fakeTrackEvent);
-            //double distance = _uut.Distance(_track1, _track2);
-            //Assert.That(distance, Is.EqualTo(50000));
-            Assert.That(_conditionList.Count, Is.EqualTo(1));
+
+            Assert.That(_conditionList.Count, Is.EqualTo(2));
         }
 
+        // 5.6
         [Test]
-        public void TwoTracks_Returns_Negative()
+        public void onTrackEdited_Conflicts_EventRaised()
         {
-            _fakeTrackEvent.tracks[_track1._tag] = _track1;
-            _fakeTrackEvent.tracks[_track2._tag] = _track2;
-            _trackFilter.TrackEdited += Raise.EventWith(_fakeTrackEvent);
-            //double distance = _uut.Distance(_track1, _track2);
-            //Assert.That(distance, Is.EqualTo(50000));
-            Assert.That(_conditionList == null, Is.True);
-        }
+            Dictionary<String, ITrack> myTracks = new Dictionary<string, ITrack>();
+            myTracks.Add(_track3._tag, _track3);
+            myTracks.Add(_track5._tag, _track5);
+            myTracks.Add(_track6._tag, _track6);
 
+            _fakeTrackEvent.tracks = myTracks;
+            _trackFilter.TrackEdited += Raise.EventWith(_fakeTrackEvent);
+
+            Assert.That(_eventCalled, Is.EqualTo(1));
+        }
     }
 }
